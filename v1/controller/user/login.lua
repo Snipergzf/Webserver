@@ -14,7 +14,7 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.name = arg.name
+	self.phone = arg.phone
 	self.pwd = arg.pwd
     return self
 end
@@ -53,7 +53,7 @@ local function check(self)
 	end
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
 	res, err, errno, sqlstate =
-		db:query("SELECT id, pwd FROM User WHERE name = "..ngx.quote_sql_str(self.name), 10)
+		db:query("SELECT id, pwd FROM User WHERE phone = "..ngx.quote_sql_str(self.phone), 10)
 	local cjson = require "cjson"
 
 	if not res or not res[1] then

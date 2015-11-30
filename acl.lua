@@ -72,7 +72,8 @@ _M.acl_list = setmetatable({
 	['user/register'] = _M.rule_always_pass,
 	['user/get_avatar'] = _M.rule_always_pass,
 	['comment/get'] = _M.rule_always_pass,
-	['course/searchSin'] = _M.rule_always_pass,
+	['course/searchOne'] = _M.rule_always_pass,
+	['course/searchAll'] = _M.rule_always_pass,
 }, {
 	__index = function() return _M.rule_check_token end
 })

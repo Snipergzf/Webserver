@@ -13,9 +13,9 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.name = arg.name
+	self.phone = arg.phone
 	self.pwd = arg.pwd
-	self.email = arg.email
+	--self.email = arg.email
 	return self
 end
 
@@ -24,7 +24,7 @@ function _M.response(self)
 	local _, _em = common.try_load_model('user_action')
 	local _tb = {action="register"}
 	while true do
-		if not self.name or not self.pwd or not self.email or self.name == '' or self.pwd == '' then
+		if not self.phone or not self.pwd or self.phone == '' or self.pwd == '' then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
@@ -53,8 +53,8 @@ local function reg(self)
 	end
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
 	res, err, errno, sqlstate =
-		db:query("INSERT INTO User (`name`, `pwd`, `email`) VALUES ("..
-			ngx.quote_sql_str(self.name)..", "..ngx.quote_sql_str(self.pwd)..", "..ngx.quote_sql_str(self.email)..")"
+		db:query("INSERT INTO User (`phone`, `pwd`) VALUES ("..
+			ngx.quote_sql_str(self.phone)..", "..ngx.quote_sql_str(self.pwd)..")"
 		, 10)
 	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
 	if errno ~= nil and errno > 0 then

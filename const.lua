@@ -22,7 +22,8 @@ local _C = {
 	ERR_API_DELETE_FRIEND_FAILED = 8, [8] = 'delete friend failed! you are not friends',
 	ERR_API_ADD_COMMENT_FAILED = 10, [10] = 'failed to add comment',
 	ERR_API_DEL_COMMENT_FAILED = 11, [11] = 'failed to del comment',
-	ERR_API_GET_COURSE_FAILED = 11, [11] = 'invaild uid',
+	ERR_API_GET_COURSE_FAILED = 11, [11] = 'bad argument',
+	
 	
 	-- client fail (40x)
 	-- 400 20000~20099
