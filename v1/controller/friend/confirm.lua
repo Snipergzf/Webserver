@@ -50,7 +50,6 @@ end
 local function confirm_friend(self)
 	local db = common.get_dbconn()
 	if not db then
-		ngx.log(ngx.ERR, "[LI] failed to connect: ", err, ": ", errno, " ", sqlstate)
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY

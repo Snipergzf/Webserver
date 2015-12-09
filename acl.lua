@@ -74,6 +74,7 @@ _M.acl_list = setmetatable({
 	['comment/get'] = _M.rule_always_pass,
 	['course/searchOne'] = _M.rule_always_pass,
 	['course/searchAll'] = _M.rule_always_pass,
+	['friend/search'] = _M.rule_always_pass,
 }, {
 	__index = function() return _M.rule_check_token end
 })

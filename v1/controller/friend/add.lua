@@ -32,7 +32,7 @@ function _M.response(self)
 		
 		local result = self:add_friend()
 		if result == const.API_STATUS_OK then
-			_tb.result="succeed"			
+			_tb.result="succeed"
 			_tb.certificate = self.certificate
 		else -- >0
 			_tb.code = result
@@ -50,7 +50,6 @@ end
 local function add_friend(self)
 	local db = common.get_dbconn()
 	if not db then
-		ngx.log(ngx.ERR, "[LI] failed to connect: ", err, ": ", errno, " ", sqlstate)
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
 	

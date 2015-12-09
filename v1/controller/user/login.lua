@@ -24,7 +24,7 @@ function _M.response(self)
 	local _, _em = common.try_load_model('user_action')
 	local _tb = {action="login"}
 	while true do
-		if not self.name or not self.pwd then
+		if not self.phone or not self.pwd then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
@@ -65,7 +65,7 @@ local function check(self)
 	end
 	
 	local uid = res[1]['id']
-	local token = common.random_str(32, tostring(self.name))
+	local token = common.random_str(32, tostring(self.phone))
 	res, err, errno, sqlstate =
 		db:query("INSERT INTO Token SET uid='"..uid.."', token='"..token.."', timeout="..(ngx.time() + const.SESSION_EXPIRE) .." "..
 		"ON DUPLICATE KEY UPDATE token ='"..token.."', timeout="..(ngx.time() + const.SESSION_EXPIRE), 10)

@@ -18,7 +18,10 @@ function _M.new(_, arg)
 		action = arg.action,
 		result = arg.result or 'failed',
 		uid = arg.uid,
-		certificate = arg.certificate
+		certificate = arg.certificate,
+		name = arg.name,
+		user_rank = arg.user_rank,
+		avatar = arg.avatar
 	}
 	return self
 end
