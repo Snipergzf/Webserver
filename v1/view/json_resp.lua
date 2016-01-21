@@ -16,7 +16,8 @@ function _M.new(_, data, code)
 	self.data = data
 	self.http_status = code or '200'
 	self.content_type = "application/json"
-	return self
+    ngx.header['Access-Control-Allow-Origin'] = "*"
+    return self
 end
 
 function _M.get_view(self)

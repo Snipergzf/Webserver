@@ -5,7 +5,7 @@
 local common = require('common')
 local const = require('const')
 local _, super = common.try_load_controller('_base')
-
+local _debug = require('_debug')
 local _M = {_VERSION = '0.01'}
 
 
@@ -16,6 +16,7 @@ function _M.new(_, arg)
 	)
 	self.phone = arg.phone
 	self.pwd = arg.pwd
+	self.imei = arg.imei
     return self
 end
 
@@ -65,6 +66,15 @@ local function check(self)
 	end
 	
 	local uid = res[1]['id']
+	res, err, errno, sqlstate = 
+		db:query("SELECT imei FROM OnlineUser WHERE uid="..tostring(uid),10)
+	if res[1] then
+		if res[1]['imei'] ~= self.imei then
+			return const.ERR_API_SAME_USER_LOGIN, nil, nil
+		end
+	else
+		db:query("INSERT INTO OnlineUser SET uid='"..uid.."',imei="..ngx.quote_sql_str(self.imei),10)
+	end
 	local token = common.random_str(32, tostring(self.phone))
 	res, err, errno, sqlstate =
 		db:query("INSERT INTO Token SET uid='"..uid.."', token='"..token.."', timeout="..(ngx.time() + const.SESSION_EXPIRE) .." "..

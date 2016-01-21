@@ -1,4 +1,4 @@
--- Copyright (C) 2015 gzf
+	-- Copyright (C) 2015 gzf
 
 -- event controller
 
@@ -58,7 +58,7 @@ local function insert(self)
 	if not db then
 		return const.ERR_API_DATABASE_DOWN
 	end
-	local col = db:get_col("cEvent")
+	local col = db:get_col("cEvent_tmp")
 	local r = col:find_one({_id = self.event_id},{})
 	if r then
 		return const.ERR_API_INSERT_EVENT

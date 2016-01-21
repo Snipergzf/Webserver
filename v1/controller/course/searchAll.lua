@@ -63,7 +63,7 @@ local function get_course_all(self)
 		table.insert (tb,index,item)
 	end
 	if not tb then
-		return const.API_STATUS_OK, nil
+		return const.ERR_API_NO_COURSE, nil
 	end
 	return const.API_STATUS_OK,tb
 end

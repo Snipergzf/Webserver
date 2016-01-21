@@ -17,7 +17,8 @@ function _M.new(_, arg)
 	self.data.comment = {
 		action = arg.action,
 		result = arg.result,
-		comments = arg.comments
+		comments = arg.comments,
+		sum = arg.sum
 	}
 	return self
 end

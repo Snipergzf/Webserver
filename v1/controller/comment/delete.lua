@@ -1,4 +1,4 @@
--- Copyright (C) 2015 fffonion
+-- Copyright (C) 2015 gzf
 
 -- login controller
 
@@ -6,9 +6,7 @@ local common = require('common')
 local const = require('const')
 local config = require('config')
 local _, super = common.try_load_controller('_base')
-
 local _M = {_VERSION = '0.01'}
-
 
 function _M.new(_, arg)
     local self = setmetatable(
@@ -64,7 +62,8 @@ local function get(self)
 	if not r then
 		return const.ERR_API_DEL_COMMENT_FAILED
 	end
-	local n, err, dt = col:update({_id = self.event_id}, {["$pull"] = {cEvent_comment = {comment_id = self.comment_id, speaker_id = self.uid}}}, 0, 0, 0)
+	local del_count = common.table_count(r['cEvent_comment'],{'comment_id','speaker_id'},{self.comment_id,self.uid})
+	local n, err, dt = col:update({_id = self.event_id}, {["$pull"] = {cEvent_comment = {comment_id = self.comment_id, speaker_id = self.uid}},["$inc"]={ size_reduce = del_count}}, 0, 0, 0)
 	-- n always returns 1 here, for http://stackoverflow.com/questions/26144405/mongodb-update-pull-always-return-1
 	-- so we can only try to find it
 	local r = col:find_one({_id = self.event_id, cEvent_comment={['$elemMatch']={comment_id = self.comment_id}}}, {cEvent_comment = 1, _id = 0})

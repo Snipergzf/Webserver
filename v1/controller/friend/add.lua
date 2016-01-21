@@ -81,7 +81,7 @@ local function add_friend(self)
 		db:query("INSERT INTO add_friends (`uid`, `friend_id`,`certificate`,`expiration_time`) VALUES ("..
 			ngx.quote_sql_str(self.uid)..", "..ngx.quote_sql_str(self.friend_id)..", "..
 			ngx.quote_sql_str(self.certificate)..", "..(ngx.time()+864000)..")", 10)
-	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	-- ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
 	
 	if errno ~= nil and errno > 0 then
 		return const.ERR_API_ADD_FRIEND_FAILED, nil

@@ -1,6 +1,5 @@
 -- Copyright (C) 2015 gzf
-
--- course controller
+-- event controller
 
 local common = require('common')
 local const = require('const')
@@ -15,23 +14,15 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.account = arg.account
-	self.course_id = arg.course_id
-	self.course = arg.course
+	self.event_id = arg.event_id
 	return self
 end
 
 function _M.response(self)
-	local _, _em = common.try_load_model('course_action')
-	local _tb = {action="insert_course"}
+	local _, _em = common.try_load_model('event_action')
+	local _tb = {action="delete_event"}
 	while true do
-		if not self.account or self.account == '' then
-			_, _em = common.try_load_model('error')
-			_tb = {code = const.ERR_API_MISSING_ARG}
-			break
-		end
-		
-		local result= self:insert_course()
+		local result = self:delete()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
 		else -- >0
@@ -45,27 +36,23 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-local function insert_course(self)
+local function delete(self)
 	local db = common.get_mongo()
 	if not db then
-		return const.ERR_API_DATABASE_DOWN, nil
+		return const.ERR_API_DATABASE_DOWN
 	end
-	local col = db:get_col("course_tmp")
-	
-	local r = col:find_one({_id = self.course_id},{})
-	if r then
-		return const.ERR_API_INSERT_COURSE_
+	local col = db:get_col("cEvent_tmp")
+	local r = col:find_one({_id = self.event_id},{})
+	if not r then
+		return const.ERR_API_NO_SUCH_EVENT
 	end
 	
-	local course_doc = cjson.decode(self.course)
-	local n,err = col:insert({course_doc},1,1)
-	
+	local n, err = col:delete({_id = self.event_id},1,1)
 	if not n then
-		return const.ERR_API_INSERT_COURSE
+		return const.ERR_API_DELETE_EVENT
 	end
-	
 	return const.API_STATUS_OK
 end
-_M.insert_course = insert_course
+_M.delete = delete
 
 return _M

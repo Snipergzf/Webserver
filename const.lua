@@ -34,8 +34,15 @@ local _C = {
 	ERR_API_INSERT_EVENT_ = 20, [20] = 'insert event into database failed',
 	ERR_API_INSERT_COURSE = 21, [21] = 'insert course into database failed',
 	ERR_API_INSERT_COURSE_ = 22, [22] = 'the course you insert is exists',
-	
-	
+	ERR_API_SAME_USER_LOGIN = 23, [23] = 'login failed! you have logined in other machine',
+	ERR_API_NO_SUCH_EVENT = 24, [24] = 'no such event',
+	ERR_API_REGISTER_FAILED = 25, [25] = 'register failed, please register again sometime later',
+	ERR_API_FEEDBACK_FAILED = 26, [26] = 'feedback failed',
+	ERR_API_NO_SUCH_GROUP = 27, [27] = 'no such group',
+	ERR_API_NO_COURSE = 28, [28] = 'you have no course this term',
+	ERR_API_DELETE_EVENT = 29, [29] = 'delete event failed',
+	ERR_API_INVALID_POS = 30, [30] = 'pos value is bigger than sum value',
+	ERR_API_RESET_PWD_FAILED = 31, [31] = 'reset password failed, please try again',
 	
 	-- client fail (40x)
 	-- 400 20000~20099

@@ -60,10 +60,15 @@ local function delete_friend(self)
 	end
 	
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
+	db:query("start transaction", 10)
 	res, err, errno, sqlstate =
 		db:query("DELETE FROM Friends WHERE uid = "..
 			ngx.quote_sql_str(self.uid).."AND friend_id = "..ngx.quote_sql_str(self.friend_id), 10)
-	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	res, err, errno, sqlstate =
+		db:query("DELETE FROM Friends WHERE uid = "..
+			ngx.quote_sql_str(self.friend_id).."AND friend_id = "..ngx.quote_sql_str(self.uid), 10)
+	-- ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	db:query("commit", 10)
 	
 	return const.API_STATUS_OK
 end

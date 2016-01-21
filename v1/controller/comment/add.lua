@@ -61,9 +61,9 @@ local function get(self)
 		comment_time = ngx.time(),
 		comment_id = common.random_str(20, tostring(self.uid).."-comment")
 	}
-	local n, err = col:update({_id = self.event_id}, {["$push"] = {
-			cEvent_comment = cmt
-		}}, 0, 0, 1)
+	-- local n, err = col:update({_id = self.event_id}, {["$push"] = {cEvent_comment = cmt}}, 0, 0, 1)
+	
+	local n, err = col:update({_id = self.event_id}, {["$push"] = {cEvent_comment = cmt},["$inc"] = {size_increase = 1}}, 0, 0, 1)
 	if n == nil or n < 1 then
 		ngx.log(ngx.ERR, "[LI] add comment failed: ", n, " ", err)
 		return const.ERR_API_ADD_COMMENT_FAILED

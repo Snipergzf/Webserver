@@ -133,6 +133,8 @@ function _M.random_str(l, seed)
  
     local ret =''
 	-- os.time() is precise to second
+	-- math.randomseed(tonumber(tostring(os.time()):reverse():sub(1, 6)) + ngx.crc32_short(seed or ""))
+		-- math.randomseed(os.time() + ngx.crc32_short(seed or ""))
 	math.randomseed(os.time() * 1000 + ngx.crc32_short(seed or ""))
     for i=1 ,l do
         local pos = math.random(1, string.len(s))
@@ -210,6 +212,16 @@ function _M.popen(cmd, raw)
         ' '
     )
    return output, rc
+end
+
+function _M.table_count(tb,tag,match_str)
+	local count = 0
+	for index,item in pairs(tb) do
+		if (item[tag[1]] == match_str[1]) and (item[tag[2]] == match_str[2]) then
+			count = count + 1
+		end
+	end
+	return count
 end
 
 function _M.parse_multipart()

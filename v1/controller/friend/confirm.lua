@@ -74,7 +74,6 @@ local function confirm_friend(self)
 		return const.ERR_API_ADD_FRIEND_FAILED_CERTIFICATE_WRONG, nil
 	end
 	
-	
 	db:query("start transaction", 10)
 	res, err, errno, sqlstate =
 		db:query("INSERT INTO Friends (`uid`, `friend_id`) VALUES ("..
@@ -83,9 +82,9 @@ local function confirm_friend(self)
 		, 10)
 	res_, err_, errno_, sqlstate_ =
 		db:query("DELETE FROM add_friends WHERE uid = "..ngx.quote_sql_str(self.friend_id).." AND friend_id = "..ngx.quote_sql_str(self.uid), 10)
-	db:query("commit", 10)	
+	db:query("commit", 10)
 		
-	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	--ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
 	
 	--if errno ~= nil and errno > 0 and errno_ ~= nil and errno_ > 0 then
 		--return const.ERR_API_ADD_FRIEND_FAILED, nil

@@ -5,7 +5,7 @@
 local common = require('common')
 local const = require('const')
 local _, super = common.try_load_controller('_base')
-
+local cjson = require('cjson')
 local _M = {_VERSION = '0.01'}
 
 function _M.new(_, arg)
@@ -15,7 +15,6 @@ function _M.new(_, arg)
 	)
 	self.phone = arg.phone
 	self.pwd = arg.pwd
-	--self.email = arg.email
 	return self
 end
 
@@ -49,18 +48,37 @@ end
 local function reg(self)
 	local db = common.get_dbconn()
 	if not db then
-		return const.ERR_API_DATABASE_DOWN, nil
+		return const.ERR_API_DATABASE_DOWN
 	end
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
 	res, err, errno, sqlstate =
 		db:query("INSERT INTO User (`phone`, `pwd`) VALUES ("..
 			ngx.quote_sql_str(self.phone)..", "..ngx.quote_sql_str(self.pwd)..")"
 		, 10)
-	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	
 	if errno ~= nil and errno > 0 then
 		return const.ERR_API_REG_FAILED_USER_EXISTS
 	end
 	
+	res, err, errno, sqlstate =
+		db:query("SELECT id FROM User WHERE phone="..ngx.quote_sql_str(self.phone), 10)
+	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	local uid = res[1]['id']
+	local db_ = common.get_mongo()
+	if not db_ then
+		return const.ERR_API_DATABASE_DOWN
+	end
+	
+	local col = db_:get_col("cUser")
+	local cUser_doc = {
+		_id = tostring(uid)
+	}
+	local n, err = col:insert({cUser_doc},1,1)
+	if not n then
+		res, err, errno, sqlstate =
+			db:query("DELETE FROM User WHERE phone="..ngx.quote_sql_str(self.phone), 10)
+		return const.ERR_API_REGISTER_FAILED
+	end
 	return const.API_STATUS_OK
 end
 _M.reg = reg

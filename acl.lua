@@ -1,5 +1,4 @@
 -- Copyright (C) 2015 fffonion
-
 -- access control module
 
 local common = require('common')
@@ -70,6 +69,7 @@ _M.acl_list = setmetatable({
 	['error'] = _M.rule_always_pass,
 	['user/login'] = _M.rule_always_pass,
 	['user/register'] = _M.rule_always_pass,
+	['user/reset_pwd'] = _M.rule_always_pass,
 	['user/get_avatar'] = _M.rule_always_pass,
 	['user/search'] = _M.rule_always_pass,
 	['user/get_info'] = _M.rule_always_pass,
@@ -82,6 +82,15 @@ _M.acl_list = setmetatable({
 	['event/push_img'] = _M.rule_always_pass,
 	['event/delete_img'] = _M.rule_always_pass,
 	['event/insert'] = _M.rule_always_pass,
+	['event/search'] = _M.rule_always_pass,
+	['event/search_tmp'] = _M.rule_always_pass,
+	['event/search_time'] = _M.rule_always_pass,
+	['event/feedback_add'] = _M.rule_always_pass,
+	['event/feedback_del'] = _M.rule_always_pass,
+	['event/update'] = _M.rule_always_pass,
+	['event/move'] = _M.rule_always_pass,
+	['event/delete_tmp'] = _M.rule_always_pass,
+	['group/search_member'] = _M.rule_always_pass,
 }, {
 	__index = function() return _M.rule_check_token end
 })
