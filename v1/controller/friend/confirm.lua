@@ -1,6 +1,6 @@
 -- Copyright (C) 2015 gzf
 
--- login controller
+-- friend controller
 
 local common = require('common')
 local const = require('const')
@@ -59,7 +59,7 @@ local function confirm_friend(self)
 			
 	
 	if res[1]['count'] ~= "0" then
-		return const.ERR_API_CONFIRM_FRIEND_FAILED_EXISTS, nil
+		return const.ERR_API_COMFIRM_FRIEND_FAILED_EXISTS, nil
 	end
 	
 	res, err, errno, sqlstate =
@@ -67,7 +67,7 @@ local function confirm_friend(self)
 			ngx.quote_sql_str(self.uid), 10)
 
 	if not res or not res[1] then 
-		return const.ERR_API_CONFIRM_FRIEND_FAILED_REQUIRE_NOT_EXISTS, nil
+		return const.ERR_API_COMFIRM_FRIEND_FAILED_REQUIRE_NOT_EXISTS, nil
 	end
 		
 	if res[1]['certificate'] ~= self.certificate then 

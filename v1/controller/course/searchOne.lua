@@ -27,13 +27,13 @@ function _M.response(self)
 	while true do
 		if not self.uid or not self.search_name or self.uid == '' or self.search_name == '' then
 			_, _em = common.try_load_model('error')
-			_tb = {code = const.ERR_API_GET_COURSE_FAILED}
+			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
 		
 		local result,_course = self:get_course()
 		if result == const.API_STATUS_OK then
-			_tb.result="succeed"			
+			_tb.result="succeed"
 			_tb.course = _course or {}
 		else -- >0
 			_tb.code = result

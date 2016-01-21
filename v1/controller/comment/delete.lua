@@ -17,7 +17,8 @@ function _M.new(_, arg)
 	)
 	self.uid = tonumber(arg.uid or '-')
 	self.comment_id = arg.comment_id
-	self.event_id = tonumber(arg.event_id or '-')
+	-- self.event_id = tonumber(arg.event_id or '-')
+	self.event_id = arg.event_id or '-'
 	return self
 end
 

@@ -6,7 +6,7 @@ local common = require('common')
 local const = require('const')
 local config = require('config')
 local _, super = common.try_load_controller('_base')
-
+local _debug = require('_debug')
 local _M = {_VERSION = '0.01'}
 
 
@@ -61,7 +61,18 @@ local function add_friend(self)
 		db:query("SELECT COUNT(*) AS count FROM Friends WHERE uid = "..ngx.quote_sql_str(self.uid).."AND friend_id = "..ngx.quote_sql_str(self.friend_id),10)
 		
 	if res[1]['count'] ~= "0" then
-		return const.ERR_API_COMMIT_FRIEND_FAILED_EXISTS, nil
+		return const.ERR_API_COMFIRM_FRIEND_FAILED_EXISTS, nil
+	end
+	
+	res,err,errno,sqlstate = 
+		db:query("SELECT expiration_time FROM add_friends WHERE uid = "..ngx.quote_sql_str(self.uid).."AND friend_id = "..ngx.quote_sql_str(self.friend_id),10)
+	
+	--if no result find will return res = nil
+	if res and res[1] then
+		if ngx.time() >= res[1]['expiration_time'] then
+			res,err,errno,sqlstate = 
+			db:query("DELETE FROM add_friends WHERE uid = "..ngx.quote_sql_str(self.uid).."AND friend_id = "..ngx.quote_sql_str(self.friend_id),10)
+		end
 	end
 	
 	self.certificate = common.random_str(32,self.uid.."add_friend"..self.friend_id)
@@ -69,8 +80,7 @@ local function add_friend(self)
 	res, err, errno, sqlstate =
 		db:query("INSERT INTO add_friends (`uid`, `friend_id`,`certificate`,`expiration_time`) VALUES ("..
 			ngx.quote_sql_str(self.uid)..", "..ngx.quote_sql_str(self.friend_id)..", "..
-			ngx.quote_sql_str(self.certificate)..", "..(ngx.time()+864000)..")"
-		, 10)
+			ngx.quote_sql_str(self.certificate)..", "..(ngx.time()+864000)..")", 10)
 	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
 	
 	if errno ~= nil and errno > 0 then

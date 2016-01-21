@@ -30,13 +30,10 @@ function _M.response(self)
 			break
 		end
 		
-		local result,_id,_name,_user_rank,_avatar = self:search_friend()
+		local result,info = self:search_friend()
 		if result == const.API_STATUS_OK then
 			_tb.result = "succeed"
-			_tb.uid = _id
-			_tb.name = _name
-			_tb.user_rank = _user_rank
-			_tb.avatar = _avatar
+			_tb.info = info
 		else -- >0
 			_tb.code = result
 		end
@@ -57,17 +54,30 @@ local function search_friend(self)
 	end
 	
 	res,err,errno,sqlstate = 
-		db:query("SELECT id,name,user_rank,avatar FROM User WHERE phone = "..ngx.quote_sql_str(self.search_name),10)
+		db:query("SELECT id,name,user_rank,avatar,sex FROM User WHERE phone = "..ngx.quote_sql_str(self.search_name),10)
 	--ngx.log(ngx.ERR,"query result: ",err,": ",errno,": ",res)
 	--_debug.print_r(res)
+	
 	if res[1] == nil then
-		return const.ERR_API_SEARCH_FRIEND_FAILED, nil
+		res,err,errno,sqlstate = 
+			db:query("SELECT id,name,user_rank,avatar,sex FROM User WHERE name = "..ngx.quote_sql_str(self.search_name),10)
 	end
-	local id = res[1]['id']
-	local name = res[1]['name']
-	local user_rank = res[1]['user_rank']
-	local avatar = res[1]['avatar']
-	return const.API_STATUS_OK,id,name,user_rank,avatar
+	
+	if res[1] == nil then
+		return const.ERR_API_NO_SUCH_USER, nil
+	end
+	local tb = {}
+	tb.id = res[1]['id']
+	tb.name = res[1]['name']
+	tb.user_rank = res[1]['user_rank']
+	tb.sex = res[1]['sex']
+	if not res[1]['avatar'] or res[1]['avatar'] == ngx.null then
+		tb.avatar = 'default'
+	else
+		tb.avatar = config.HOST .. "/images/avatar/"..res[1]['avatar']
+	end
+	-- local avatar = res[1]['avatar']
+	return const.API_STATUS_OK,tb
 end
 _M.search_friend = search_friend
 

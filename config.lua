@@ -16,7 +16,9 @@ local _C = {
 	
 	UPLOAD_TEMP_DIR = "/tmp",
 	AVATAR_DIR = "/home/www/html/images/avatar",
+	EVENT_IMG_DIR = "/home/www/html/images/event",
 	AVATAR_DIR_DEPTH = 3,
+	EVENT_IMG_DIR_DEPTH = 3,
 	AVATAR_DEFAULT_FILE = "default_avatar.jpg",
 	
 	HOST = "http://123.56.142.241",

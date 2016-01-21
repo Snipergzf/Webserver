@@ -15,7 +15,8 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.event_id = tonumber(arg.event_id or '-') -- '-' is placeholder in case of arg.event_id==nil
+	-- self.event_id = tonumber(arg.event_id or '-') -- '-' is placeholder in case of arg.event_id==nil
+	self.event_id = arg.event_id or '-'
 	self.uid = tonumber(arg.uid or '-')
 	self.content = arg.content
     return self

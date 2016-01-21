@@ -1,10 +1,9 @@
--- Copyright (C) 2015 fffonion
+-- Copyright (C) 2015 gzf
 
--- login controller
+-- course controller
 
 local common = require('common')
 local const = require('const')
-local config = require('config')
 local _, super = common.try_load_controller('_base')
 
 local _M = {_VERSION = '0.01'}
@@ -15,28 +14,27 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
-	return self
+	self.account = arg.account
+	self.pwd = arg.pwd
+    return self
 end
+
 
 function _M.response(self)
 	local _, _em = common.try_load_model('user_action')
-	local _tb = {action="get_avatar"}
+	local _tb = {action="login"}
 	while true do
-		if not self.uid then
+		if not self.account or not self.pwd then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
-		
-		local result, filepath = self:get()
+		local result = self:check()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
-			_tb.avatar = filepath
 		else -- >0
 			_tb.code = result
 		end
-		--ngx.say(tostring(_)..'+'..tostring(_em))
 		break
 	end
 	local em = _em:new(_tb)
@@ -45,22 +43,25 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-
-local function get(self)
+local function check(self)
 	local db = common.get_dbconn()
 	if not db then
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
+	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
 	res, err, errno, sqlstate =
-		db:query("SELECT avatar FROM User WHERE id="..ngx.quote_sql_str(self.uid), 10)
+		db:query("SELECT account,pwd FROM Admin WHERE account = "..ngx.quote_sql_str(self.account), 10)
+
 	if not res or not res[1] then
 		return const.ERR_API_NO_SUCH_USER, nil
 	end
-	if res[1]['avatar'] == ngx.null then
-		return const.API_STATUS_OK, 'default'
+	
+	if res[1]['pwd'] ~= self.pwd then
+		return const.ERR_API_LOGIN_FAILED_WRONG_PWD
 	end
-	return const.API_STATUS_OK, config.HOST .. "/images/avatar/"..res[1]['avatar']
+	
+	return const.API_STATUS_OK
 end
-_M.get = get
+_M.check = check
 
 return _M

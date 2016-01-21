@@ -1,6 +1,6 @@
--- Copyright (C) 2015 fffonion
+-- Copyright (C) 2015 gzf
 
--- login controller
+-- course controller
 
 local common = require('common')
 local const = require('const')
@@ -15,28 +15,28 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
+	self.account = arg.account
+	self.course_id = arg.course_id
+	self.course = arg.course
 	return self
 end
 
 function _M.response(self)
-	local _, _em = common.try_load_model('user_action')
-	local _tb = {action="get_avatar"}
+	local _, _em = common.try_load_model('course_action')
+	local _tb = {action="insert_course"}
 	while true do
-		if not self.uid then
+		if not self.account or self.account == '' then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
 		
-		local result, filepath = self:get()
+		local result= self:insert_course()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
-			_tb.avatar = filepath
 		else -- >0
 			_tb.code = result
 		end
-		--ngx.say(tostring(_)..'+'..tostring(_em))
 		break
 	end
 	local em = _em:new(_tb)
@@ -45,22 +45,27 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-
-local function get(self)
-	local db = common.get_dbconn()
+local function insert_course(self)
+	local db = common.get_mongo()
 	if not db then
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
-	res, err, errno, sqlstate =
-		db:query("SELECT avatar FROM User WHERE id="..ngx.quote_sql_str(self.uid), 10)
-	if not res or not res[1] then
-		return const.ERR_API_NO_SUCH_USER, nil
+	local col = db:get_col("course_tmp")
+	
+	local r = col:find_one({_id = self.course_id},{})
+	if r then
+		return const.ERR_API_INSERT_COURSE_
 	end
-	if res[1]['avatar'] == ngx.null then
-		return const.API_STATUS_OK, 'default'
+	
+	local course_doc = cjson.decode(self.course)
+	local n,err = col:insert({course_doc},1,1)
+	
+	if not n then
+		return const.ERR_API_INSERT_COURSE
 	end
-	return const.API_STATUS_OK, config.HOST .. "/images/avatar/"..res[1]['avatar']
+	
+	return const.API_STATUS_OK
 end
-_M.get = get
+_M.insert_course = insert_course
 
 return _M

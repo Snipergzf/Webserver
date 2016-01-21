@@ -31,9 +31,10 @@ function _M.response(self)
 			break
 		end
 		
-		local result = self:update_avatar()
+		local result, avatar_path = self:update_avatar()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
+			_tb.avatar=avatar_path
 		else -- >0
 			_tb.code = result
 		end
@@ -79,7 +80,7 @@ local function update_avatar(self)
 	end
 	res, err, errno, sqlstate =
 		db:query("UPDATE User SET avatar = '"..self.upload.f..".jpg' WHERE id="..ngx.quote_sql_str(self.uid), 10)
-	return const.API_STATUS_OK
+	return const.API_STATUS_OK, config.HOST .. "/images/avatar/"..self.upload.f..".jpg"
 end
 _M.update_avatar = update_avatar
 

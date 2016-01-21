@@ -71,10 +71,17 @@ _M.acl_list = setmetatable({
 	['user/login'] = _M.rule_always_pass,
 	['user/register'] = _M.rule_always_pass,
 	['user/get_avatar'] = _M.rule_always_pass,
+	['user/search'] = _M.rule_always_pass,
+	['user/get_info'] = _M.rule_always_pass,
 	['comment/get'] = _M.rule_always_pass,
 	['course/searchOne'] = _M.rule_always_pass,
 	['course/searchAll'] = _M.rule_always_pass,
+	['course/login'] = _M.rule_always_pass,
+	['course/insert'] = _M.rule_always_pass,
 	['friend/search'] = _M.rule_always_pass,
+	['event/push_img'] = _M.rule_always_pass,
+	['event/delete_img'] = _M.rule_always_pass,
+	['event/insert'] = _M.rule_always_pass,
 }, {
 	__index = function() return _M.rule_check_token end
 })
