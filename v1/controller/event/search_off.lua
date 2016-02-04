@@ -22,15 +22,15 @@ end
 
 function _M.response(self)
 	local _, _em = common.try_load_model('event_action')
-	local _tb = {action="update_event"}
+	local _tb = {action="search_event"}
 	while true do
-		if not self.event_id or self.event_id == "" then
+		if not self.uid or self.uid == "" then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
 
-		local result, event = self:update()
+		local result, event = self:search()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
 			_tb.event = event or {}
@@ -47,22 +47,19 @@ function _M.response(self)
 end
 
 
-local function update(self)
+local function search(self)
 	local db = common.get_mongo()
 	if not db then
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
-	local col = db:get_col("cEvent")
-	local r = col:find_one({_id = self.event_id},{share_num=1,click_num=1,participate_num=1,size_increase=1,size_reduce=1})
+	local col = db:get_col("cEvent_off")
+	local r = col:find_one({_id = self.event_id},{_id=1,cEvent_name=1,cEvent_time=1,cEvent_content=1,
+		cEvent_theme=1,cEvent_place=1,cEvent_provider=1,cEvent_publish=1,share_num=1,click_num=1,participate_num=1})
 	if not r then
 		return const.ERR_API_NO_SUCH_EVENT,nil
 	end
-	local size_increase = tonumber(r['size_increase'] or '0')
-	local size_reduce = tonumber(r['size_reduce'] or '0')
-	local size_detal = (size_increase - size_reduce)
-	r.size = size_detal
 	return const.API_STATUS_OK, r
 end
-_M.update = update
+_M.search = search
 
 return _M

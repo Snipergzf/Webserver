@@ -1,4 +1,4 @@
--- Copyright (C) 2015 gzf
+	-- Copyright (C) 2015 gzf
 
 -- event controller
 
@@ -6,7 +6,7 @@ local common = require('common')
 local const = require('const')
 local config = require('config')
 local _, super = common.try_load_controller('_base')
-
+local cjson = require('cjson')
 local _M = {_VERSION = '0.01'}
 
 
@@ -15,29 +15,20 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
 	self.event_id = arg.event_id
 	return self
 end
 
 function _M.response(self)
 	local _, _em = common.try_load_model('event_action')
-	local _tb = {action="search_event"}
+	local _tb = {action="move"}
 	while true do
-		if not self.uid or self.uid == "" then
-			_, _em = common.try_load_model('error')
-			_tb = {code = const.ERR_API_MISSING_ARG}
-			break
-		end
-
-		local result, event = self:search()
+		local result = self:move()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
-			_tb.event = event or {}
 		else -- >0
 			_tb.code = result
 		end
-		--ngx.say(tostring(_)..'+'..tostring(_em))
 		break
 	end
 	local em = _em:new(_tb)
@@ -46,20 +37,31 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-
-local function search(self)
+local function move(self)
 	local db = common.get_mongo()
 	if not db then
-		return const.ERR_API_DATABASE_DOWN, nil
+		return const.ERR_API_DATABASE_DOWN
 	end
-	local col = db:get_col("cEvent")
-	local r = col:find_one({_id = self.event_id},{_id=1,cEvent_name=1,cEvent_time=1,cEvent_content=1,
-		cEvent_theme=1,cEvent_place=1,cEvent_provider=1,cEvent_publish=1,share_num=1,click_num=1,participate_num=1})
+	local col = db:get_col("cEvent_tmp")
+	local r = col:find_one({_id = self.event_id},{})
 	if not r then
-		return const.ERR_API_NO_SUCH_EVENT,nil
+		return const.ERR_API_NO_SUCH_EVENT
 	end
-	return const.API_STATUS_OK, r
+	
+	local col = db:get_col("cEvent")
+	-- the method insert returns 0 for success, or nil with error message
+	local n, err = col:insert({r},1,1)
+	if not n then
+		return const.ERR_API_INSERT_EVENT_
+	end
+	
+	local col = db:get_col("cEvent_tmp")
+	local n, err = col:delete({_id = self.event_id},1,1)
+	if n==0 then
+		return const.ERR_API_DELETE_EVENT
+	end
+	return const.API_STATUS_OK
 end
-_M.search = search
+_M.move = move
 
 return _M

@@ -224,6 +224,53 @@ function _M.table_count(tb,tag,match_str)
 	return count
 end
 
+--delete member from table
+--by gzf
+function _M.table_element_delete(tb,tb_match_str)
+	local index_ = -1
+	for index,item in pairs(tb) do
+		if (item == tb_match_str) then
+			index_ = index
+		end
+	end
+	if index_ ~= -1 then
+		table.remove(tb,index_)
+	end
+	return tb
+end
+
+--joint string from table
+function _M.tabletostring(tb,str)
+	local str_ = ""
+	for index,item in pairs(tb) do
+		str_ = str_..item..str
+	end
+	return (string.sub(str_,1,-2))
+end
+
+-- trim by gzf
+function _M.trim(s) 
+	return (string.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+-- generate a activity id by gzf
+function _M.get_aid(uid)
+    return uid.."@"..tostring(ngx.time())
+end
+
+-- split by gzf
+function _M.split(str, delimiter)
+	if str==nil or str=='' or delimiter==nil then
+		return nil
+	end
+	
+    local result = {}
+    for match in (str..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match)
+    end
+    return result
+end
+
 function _M.parse_multipart()
 	local upload = require "resty.upload"
 	local cjson = require "cjson"

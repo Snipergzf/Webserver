@@ -22,7 +22,7 @@ local _C = {
 	ERR_API_DELETE_FRIEND_FAILED = 8, [8] = 'delete friend failed! you are not friends',
 	ERR_API_ADD_COMMENT_FAILED = 10, [10] = 'failed to add comment',
 	ERR_API_DEL_COMMENT_FAILED = 11, [11] = 'failed to del comment',
-	--ERR_API_GET_COURSE_FAILED = 11, [11] = 'bad argument',
+	ERR_API_GET_COURSE_FAILED = 12, [12] = 'bad argument',
 	--ERR_API_SEARCH_FRIEND_FAILED = 12, [12] = 'the friend you look for is not exist',
 	ERR_API_UPDATE_FRIEND_FAILED =13, [13] = 'you have no friend now',
 	ERR_API_UPDATE_FRIEND_FAILED_ = 14, [14] = 'update failed',
@@ -33,7 +33,7 @@ local _C = {
 	ERR_API_INSERT_EVENT = 19, [19] = 'the event you insert is exists',
 	ERR_API_INSERT_EVENT_ = 20, [20] = 'insert event into database failed',
 	ERR_API_INSERT_COURSE = 21, [21] = 'insert course into database failed',
-	ERR_API_INSERT_COURSE_ = 22, [22] = 'the course you insert is exists',
+	ERR_API_INSERT_COURSE_EXIST = 22, [22] = 'the course you insert is exists',
 	ERR_API_SAME_USER_LOGIN = 23, [23] = 'login failed! you have logined in other machine',
 	ERR_API_NO_SUCH_EVENT = 24, [24] = 'no such event',
 	ERR_API_REGISTER_FAILED = 25, [25] = 'register failed, please register again sometime later',
@@ -43,6 +43,13 @@ local _C = {
 	ERR_API_DELETE_EVENT = 29, [29] = 'delete event failed',
 	ERR_API_INVALID_POS = 30, [30] = 'pos value is bigger than sum value',
 	ERR_API_RESET_PWD_FAILED = 31, [31] = 'reset password failed, please try again',
+	ERR_API_DELETE_COURSE = 32, [32] = 'delete course fail',
+	ERR_API_NO_SUCH_COURSE = 33,[33] = 'no such course',
+	ERR_API_CREATE_ACTIVITY = 34,[34] = 'activity has already been establish',
+	ERR_API_SEARCH_ACTIVITY = 35,[35] = 'the activity you search is missing',
+	ERR_API_UPDATE_ACTIVITY = 36,[36] = 'update activity failed',
+	ERR_API_DELETE_ACTIVITY = 37,[37] = 'delete activity failed',
+	ERR_API_UPDATE_GROUP = 38,[38] = 'update group information failed',
 	
 	-- client fail (40x)
 	-- 400 20000~20099

@@ -113,7 +113,7 @@ local function update(self)
 		end
 	end
 	
-	ngx.log(ngx.ERR,"query_str:",query_str)
+	-- ngx.log(ngx.ERR,"query_str:",query_str)
 	
 	-- res, err, errno, sqlstate = 
 		-- db:query("UPDATE User SET name="..ngx.quote_sql_str(self.name)..",email="..ngx.quote_sql_str(self.email)..",user_rank="..

@@ -15,6 +15,7 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
+	self.uid = arg.uid
 	self.event_id = arg.event_id
 	self.share_num = arg.share_num
 	self.click_num = arg.click_num
@@ -54,10 +55,15 @@ local function feedback_add(self)
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
 	local col = db:get_col("cEvent")
+	local col_ = db:get_col("cUser")
 	if self.share_num and self.share_num ~= "null" and self.share_num ~= ngx.null and self.share_num ~= '' then
 		local n, err = col:update({_id = self.event_id},{["$inc"] = {share_num = 1}})
 		if err then
 			ngx.log(ngx.ERR, "[LI] feedback failed: ", n, " ", err)
+			return const.ERR_API_FEEDBACK_FAILED
+		end
+		local n, err = col_:update({_id = self.uid},{["$push"] = {shared_event = self.event_id}})
+		if err then
 			return const.ERR_API_FEEDBACK_FAILED
 		end
 	end
@@ -67,10 +73,18 @@ local function feedback_add(self)
 		if err then
 			return const.ERR_API_FEEDBACK_FAILED
 		end
+		local n, err = col_:update({_id = self.uid},{["$push"] = {clicked_event = self.event_id}})
+		if err then
+			return const.ERR_API_FEEDBACK_FAILED
+		end
 	end
 	
 	if self.participate_num and self.participate_num ~= "null" and self.participate_num ~= ngx.null and self.participate_num ~= '' then
 		local n, err = col:update({_id = self.event_id},{["$inc"] = {participate_num = 1}})
+		if err then
+			return const.ERR_API_FEEDBACK_FAILED
+		end
+		local n, err = col_:update({_id = self.uid},{["$push"] = {participated_event = self.event_id}})
 		if err then
 			return const.ERR_API_FEEDBACK_FAILED
 		end

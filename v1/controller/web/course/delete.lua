@@ -1,12 +1,12 @@
 -- Copyright (C) 2015 gzf
 
--- event controller
+-- course controller
 
 local common = require('common')
 local const = require('const')
 local config = require('config')
 local _, super = common.try_load_controller('_base')
-
+local cjson = require('cjson')
 local _M = {_VERSION = '0.01'}
 
 
@@ -15,29 +15,26 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
-	self.event_id = arg.event_id
+	self.course_id = arg.course_id
 	return self
 end
 
 function _M.response(self)
-	local _, _em = common.try_load_model('event_action')
-	local _tb = {action="update_event"}
+	local _, _em = common.try_load_model('course_action')
+	local _tb = {action="delete_course"}
 	while true do
-		if not self.event_id or self.event_id == "" then
+		if not self.course_id or self.course_id == '' then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
-
-		local result, event = self:update()
+		
+		local result= self:delete_course()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
-			_tb.event = event or {}
 		else -- >0
 			_tb.code = result
 		end
-		--ngx.say(tostring(_)..'+'..tostring(_em))
 		break
 	end
 	local em = _em:new(_tb)
@@ -46,23 +43,20 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-
-local function update(self)
+local function delete_course(self)
 	local db = common.get_mongo()
 	if not db then
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
-	local col = db:get_col("cEvent")
-	local r = col:find_one({_id = self.event_id},{share_num=1,click_num=1,participate_num=1,size_increase=1,size_reduce=1})
-	if not r then
-		return const.ERR_API_NO_SUCH_EVENT,nil
+	local col = db:get_col("course")
+	local n,err = col:delete({_id = self.course_id},1,1)
+	-- ngx.log(ngx.ERR,"n: ",n,"err: ",err)
+	if n == 0 then
+		return const.ERR_API_DELETE_COURSE
 	end
-	local size_increase = tonumber(r['size_increase'] or '0')
-	local size_reduce = tonumber(r['size_reduce'] or '0')
-	local size_detal = (size_increase - size_reduce)
-	r.size = size_detal
-	return const.API_STATUS_OK, r
+	
+	return const.API_STATUS_OK
 end
-_M.update = update
+_M.delete_course = delete_course
 
 return _M

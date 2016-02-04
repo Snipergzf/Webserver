@@ -62,7 +62,7 @@ local function reg(self)
 	
 	res, err, errno, sqlstate =
 		db:query("SELECT id FROM User WHERE phone="..ngx.quote_sql_str(self.phone), 10)
-	ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
+	-- ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno, ": ", sqlstate, ".")
 	local uid = res[1]['id']
 	local db_ = common.get_mongo()
 	if not db_ then
@@ -74,7 +74,7 @@ local function reg(self)
 		_id = tostring(uid)
 	}
 	local n, err = col:insert({cUser_doc},1,1)
-	if not n then
+	if err then
 		res, err, errno, sqlstate =
 			db:query("DELETE FROM User WHERE phone="..ngx.quote_sql_str(self.phone), 10)
 		return const.ERR_API_REGISTER_FAILED

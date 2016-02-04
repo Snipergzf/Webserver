@@ -14,10 +14,11 @@ function _M.new(_, arg)
 		super:new(arg.code, arg.errmsg)
 		, { __index = _M} 
 	)
-	self.data.friend_action = {
+	self.data.group_action = {
 		action = arg.action,
 		result = arg.result or 'failed',
 		members = arg.members,
+		group_info = arg.group_info,
 	}
 	return self
 end

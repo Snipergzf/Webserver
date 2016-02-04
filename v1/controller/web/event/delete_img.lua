@@ -15,27 +15,24 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
-	self.event_id = arg.event_id
+	self.admin_account = arg.admin_account
+	self.delete = arg.delete
 	return self
 end
 
 function _M.response(self)
 	local _, _em = common.try_load_model('event_action')
-	local _tb = {action="update_event"}
+	local _tb = {action="delete_img_action"}
 	while true do
-		if not self.event_id or self.event_id == "" then
+		if not self.admin_account or type(self.admin_account) ~= "string" or not self.delete then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
 
-		local result, event = self:update()
+		local result = self:delete_img()
 		if result == const.API_STATUS_OK then
 			_tb.result="succeed"
-			_tb.event = event or {}
-		else -- >0
-			_tb.code = result
 		end
 		--ngx.say(tostring(_)..'+'..tostring(_em))
 		break
@@ -46,23 +43,15 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-
-local function update(self)
-	local db = common.get_mongo()
-	if not db then
-		return const.ERR_API_DATABASE_DOWN, nil
+local function delete_img(self)
+	local p = config.EVENT_IMG_DIR .. "/"
+	for i=1, config.EVENT_IMG_DIR_DEPTH do
+		p = p .. string.sub(self.delete, i, i) .."/"
 	end
-	local col = db:get_col("cEvent")
-	local r = col:find_one({_id = self.event_id},{share_num=1,click_num=1,participate_num=1,size_increase=1,size_reduce=1})
-	if not r then
-		return const.ERR_API_NO_SUCH_EVENT,nil
-	end
-	local size_increase = tonumber(r['size_increase'] or '0')
-	local size_reduce = tonumber(r['size_reduce'] or '0')
-	local size_detal = (size_increase - size_reduce)
-	r.size = size_detal
-	return const.API_STATUS_OK, r
+	os.remove(p..self.delete)
+	return const.API_STATUS_OK
 end
-_M.update = update
+
+_M.delete_img = delete_img
 
 return _M

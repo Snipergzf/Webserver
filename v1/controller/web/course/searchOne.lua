@@ -5,9 +5,8 @@
 local common = require('common')
 local const = require('const')
 local config = require('config')
---local _debug = require('_debug')
 local _, super = common.try_load_controller('_base')
-
+-- local _debug = require('_debug')
 local _M = {_VERSION = '0.01'}
 
 
@@ -16,7 +15,6 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
 	self.search_name = arg.search_name
 	return self
 end
@@ -25,7 +23,7 @@ function _M.response(self)
 	local _, _em = common.try_load_model('course_action')
 	local _tb = {action="search_single_course"}
 	while true do
-		if not self.uid or not self.search_name or common.trim(self.uid) == '' or common.trim(self.search_name) == '' then
+		if not self.search_name or common.trim(self.search_name) == '' then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
@@ -53,24 +51,25 @@ local function get_course(self)
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
 	local col = db:get_col("course")
-	--local cursor = col:find({t_name = ngx.unescape_uri(self.search_name)},{c_name=1,t_name=1,c_detail=1})
 	local cursor = col:find({t_name = {["$regex"] = ngx.unescape_uri(self.search_name),["$options"] = 'i'}},{c_name=1,t_name=1,c_detail=1,s_grade=1,s_specialty=1,s_faculty=1,s_class=1})
+	-- local cursor = col:find({t_name = {["$regex"] = ngx.unescape_uri(ngx.quote_sql_str(self.search_name)),["$options"] = 'i'}},{c_name=1,t_name=1,c_detail=1,s_grade=1,s_specialty=1,s_faculty=1,s_class=1})
 	for index, item in cursor:pairs() do
 		table.insert (tb,index,item)
 	end
 	
 	if tb[1] == nil then
+		-- cursor = col:find({c_name = {["$regex"] = ngx.unescape_uri(ngx.quote_sql_str(self.search_name)),["$options"]='i'}},{c_name=1,t_name=1,c_detail=1,s_grade=1,s_specialty=1,s_faculty=1,s_class=1})
 		cursor = col:find({c_name = {["$regex"] = ngx.unescape_uri(self.search_name),["$options"]='i'}},{c_name=1,t_name=1,c_detail=1,s_grade=1,s_specialty=1,s_faculty=1,s_class=1})
 		for index, item in cursor:pairs() do
 			table.insert (tb,index,item)
 		end
 	end
-	--local index, r = cursor:next()
-	--local n,err = col:insert({{_id = 228, teacher = self.teacher_name}},1,1)
+	-- if not tb or not tb[1] then
+		-- return const.ERR_API_NO_SUCH_COURSE, nil
+	-- end
 	if #tb == 0 then
-		return const.API_STATUS_OK, nil
+		return const.ERR_API_NO_SUCH_COURSE, nil
 	end
-	--_debug.print_r(r)
 	return const.API_STATUS_OK,tb
 end
 _M.get_course = get_course

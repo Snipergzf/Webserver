@@ -1,10 +1,8 @@
 -- Copyright (C) 2015 gzf
-
--- friend controller
+-- course controller
 
 local common = require('common')
 local const = require('const')
-local config = require('config')
 local _, super = common.try_load_controller('_base')
 local _M = {_VERSION = '0.01'}
 
@@ -14,29 +12,27 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
-	self.uid = arg.uid
-	self.group_id = arg.group_id
-	return self
+	self.account = arg.account
+	self.pwd = arg.pwd
+    return self
 end
 
+
 function _M.response(self)
-	local _, _em = common.try_load_model('group_action')
-	local _tb = {action="search_group_member"}
+	local _, _em = common.try_load_model('web_action')
+	local _tb = {action="login"}
 	while true do
-		if not self.uid or common.trim(self.uid) == '' or not self.group_id or common.trim(self.group_id) == '' then
+		if not self.account or not self.pwd then
 			_, _em = common.try_load_model('error')
 			_tb = {code = const.ERR_API_MISSING_ARG}
 			break
 		end
-		
-		local result,members = self:search_member()
+		local result = self:check()
 		if result == const.API_STATUS_OK then
-			_tb.result = "succeed"
-			_tb.members = members
+			_tb.result="succeed"
 		else -- >0
 			_tb.code = result
 		end
-		--ngx.say(tostring(_)..'+'..tostring(_em))
 		break
 	end
 	local em = _em:new(_tb)
@@ -45,22 +41,25 @@ function _M.response(self)
 	common.send_resp(jv)
 end
 
-
-local function search_member(self)
+local function check(self)
 	local db = common.get_dbconn()
 	if not db then
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
-	
-	res,err,errno,sqlstate = 
-		db:query("SELECT group_member FROM groups WHERE group_id = "..ngx.quote_sql_str(self.group_id),10)
-	
-	if res[1] == nil then
-		return const.ERR_API_NO_SUCH_GROUP, nil
+	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
+	res, err, errno, sqlstate =
+		db:query("SELECT account,pwd FROM Admin WHERE account = "..ngx.quote_sql_str(self.account), 10)
+
+	if not res or not res[1] then
+		return const.ERR_API_NO_SUCH_USER, nil
 	end
 	
-	return const.API_STATUS_OK,res[1]['group_member']
+	if res[1]['pwd'] ~= self.pwd then
+		return const.ERR_API_LOGIN_FAILED_WRONG_PWD
+	end
+	
+	return const.API_STATUS_OK
 end
-_M.search_member = search_member
+_M.check = check
 
 return _M

@@ -15,6 +15,7 @@ function _M.new(_, arg)
 		super:new()
 		, { __index = _M} 
 	)
+	self.uid = arg.uid
 	self.event_id = arg.event_id
 	self.participate_num = arg.participate_num
     return self
@@ -52,9 +53,13 @@ local function feedback_del(self)
 		return const.ERR_API_DATABASE_DOWN, nil
 	end
 	local col = db:get_col("cEvent")
-	
+	local col_ = db:get_col("cUser")
 	if self.participate_num and self.participate_num ~= "null" and self.participate_num ~= ngx.null and self.participate_num ~= '' then
 		local n, err = col:update({_id = self.event_id},{["$inc"] = {participate_num = -1}})
+		if err then
+			return const.ERR_API_FEEDBACK_FAILED
+		end
+		local n, err = col_:update({_id = self.uid},{["$pull"] = {participated_event = self.event_id}})
 		if err then
 			return const.ERR_API_FEEDBACK_FAILED
 		end
