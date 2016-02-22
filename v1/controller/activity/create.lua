@@ -17,6 +17,9 @@ function _M.new(_, arg)
 	)
 	self.uid = arg.uid
 	self.a_name = arg.a_name
+	self.a_time = arg.a_time
+	self.a_place = arg.a_place
+	self.a_desc = arg.a_desc
 	return self
 end
 
@@ -52,8 +55,9 @@ local function create(self)
 	end
 	local a_id = common.get_aid(self.uid)
 	res, err, errno, sqlstate =
-		db:query("INSERT INTO Activity (`uid`, `a_id`, `participants`, `a_name`) VALUES ("..
-			ngx.quote_sql_str(self.uid)..",'"..a_id.."', "..ngx.quote_sql_str(self.uid)..", "..ngx.quote_sql_str(self.a_name)..")", 10)
+		db:query("INSERT INTO Activity (`uid`, `a_id`, `participants`, `a_name`, `a_time`, `a_place`, `a_desc`) VALUES ("..
+			ngx.quote_sql_str(self.uid)..",'"..a_id.."', "..ngx.quote_sql_str(self.uid)..", "..ngx.quote_sql_str(self.a_name)..", "..ngx.quote_sql_str(self.a_time)..", "..ngx.quote_sql_str(self.a_place)..
+			", "..ngx.quote_sql_str(self.a_desc)..")", 10)
 	if errno ~= nil and errno > 0 then
 		return const.ERR_API_CREATE_ACTIVITY, nil
 	end

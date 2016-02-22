@@ -17,7 +17,8 @@ function _M.new(_, arg)
 		action = arg.action,
 		result = arg.result or 'failed',
 		activity = arg.activity,
-		a_id = a_id,
+		a_id = arg.a_id,
+		a_participants = arg.a_participants,
 	}
 	return self
 end

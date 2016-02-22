@@ -50,6 +50,7 @@ local _C = {
 	ERR_API_UPDATE_ACTIVITY = 36,[36] = 'update activity failed',
 	ERR_API_DELETE_ACTIVITY = 37,[37] = 'delete activity failed',
 	ERR_API_UPDATE_GROUP = 38,[38] = 'update group information failed',
+	ERR_API_EXIT_ACTIVITY = 39, [39] = 'the activity you exit has no one in',
 	
 	-- client fail (40x)
 	-- 400 20000~20099
