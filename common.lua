@@ -255,7 +255,7 @@ end
 
 -- generate a activity id by gzf
 function _M.get_aid(uid)
-    return uid.."@"..tostring(ngx.time())
+    return uid.."@"..tostring(ngx.now())
 end
 
 -- split by gzf
