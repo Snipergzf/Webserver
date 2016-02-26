@@ -50,13 +50,15 @@ local function reg(self)
 	if not db then
 		return const.ERR_API_DATABASE_DOWN
 	end
+	
+	local pwd = ngx.md5(self.pwd)
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
 	res, err, errno, sqlstate =
-		db:query("INSERT INTO User (`phone`, `pwd`) VALUES ("..
-			ngx.quote_sql_str(self.phone)..", "..ngx.quote_sql_str(self.pwd)..")"
+		db:query("INSERT INTO User (`phone`, `pwd`) VALUES ("..ngx.quote_sql_str(self.phone)..", "..ngx.quote_sql_str(pwd)..")"
 		, 10)
 	
 	if errno ~= nil and errno > 0 then
+		ngx.log(ngx.ERR, "[LI] result: ", err, ": ", errno)
 		return const.ERR_API_REG_FAILED_USER_EXISTS
 	end
 	

@@ -48,7 +48,7 @@ local function check(self)
 	end
 	-- NOTE ngx.quote_sql_str will add '' to var, DON'T ADD IT MANUALLY
 	res, err, errno, sqlstate =
-		db:query("SELECT account,pwd FROM Admin WHERE account = "..ngx.quote_sql_str(self.account), 10)
+		db:query("SELECT account,pwd,rank FROM Admin WHERE account = "..ngx.quote_sql_str(self.account), 10)
 
 	if not res or not res[1] then
 		return const.ERR_API_NO_SUCH_USER, nil
